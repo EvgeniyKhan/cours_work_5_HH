@@ -22,7 +22,7 @@ def get_vacancies(employer_id):
     vacancies = []
     for item in data_vacancies.get("items", []):
         hh_vacancies = {
-            "vacancies_id": int(item.get("id", 0)),
+            "vacancy_id": int(item.get("id", 0)),
             "vacancies_name": item.get("name", ""),
             "payment": item.get("salary", {}).get("from", None) if item.get("salary") else None,
             "requirement": item.get("snippet", {}).get("requirement", ""),
