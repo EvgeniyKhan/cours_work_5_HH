@@ -34,7 +34,7 @@ def create_table():
 
     try:
         conn = psycopg2.connect(host="localhost", database="hh",
-                              user="postgres", password="2182")
+                              user="postgres", password="Igorevi4")
 
         with conn.cursor() as cur:
             cur.execute("""
