@@ -1,14 +1,14 @@
 import os
 
-from src.database import add_to_table, create_tables
-from src.db_manager import DBManager, get_vacancies_with_keyword
+from src.database import add_to_table, create_table
+from src.db_manager import DBManager
 
 
 def main():
     EMPLOYERS_LIST = os.getenv("EMPLOYERS_LIST", "")
     employers_list = [int(employer_id) for employer_id in EMPLOYERS_LIST.split(",") if employer_id]
     dbmanager = DBManager()
-    create_tables()
+    create_table()
     add_to_table(employers_list)
 
     while True:
@@ -38,7 +38,7 @@ def main():
             print()
         elif task == '5':
             keyword = input('Введите ключевое слово: ')
-            print(get_vacancies_with_keyword(keyword))
+            print(dbmanager.get_vacancies_with_keyword(keyword))
             print()
         else:
             print('Неверно')

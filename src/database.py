@@ -20,11 +20,13 @@ def create_table():
     }
 
     try:
-        conn = psycopg2.connect(**conn_params, autocommit=True)
+        conn = psycopg2.connect(**conn_params)
+        conn.autocommit = True
         cur = conn.cursor()
 
         cur.execute("DROP DATABASE IF EXISTS hh")
         cur.execute("CREATE DATABASE hh")
+        conn.commit()
 
     except psycopg2.Error as e:
         print(f"Ошибка при создании базы данных: {e}")
@@ -33,8 +35,7 @@ def create_table():
             conn.close()
 
     try:
-        conn = psycopg2.connect(host="localhost", database="hh",
-                              user="postgres", password="Igorevi4")
+        conn = psycopg2.connect(**conn_params)
 
         with conn.cursor() as cur:
             cur.execute("""
@@ -43,7 +44,7 @@ def create_table():
                     company_name varchar(260),
                     open_vacancies INTEGER
                     )""")
-        cur.execute("""
+            cur.execute("""
                             CREATE TABLE vacancies (
                             vacancy_id SERIAL PRIMARY KEY,
                             vacancies_name varchar(260),
@@ -52,12 +53,12 @@ def create_table():
                             vacancies_url TEXT,
                             employer_id INTEGER REFERENCES employers(employer_id)
                             )""")
+            conn.commit()
     except psycopg2.Error as e:
         print(f"Ошибка при создании таблиц: {e}")
     finally:
         if conn:
             conn.close()
-
 
 
 def add_to_table(employers_list):
@@ -78,10 +79,9 @@ def add_to_table(employers_list):
                 cur.execute("TRUNCATE TABLE employers, vacancies RESTART IDENTITY")
                 for employer in employers_list:
                     employer_list = get_employer(employer)
-                    cur.execute("INSERT INTO employers (employer_id, company_name, open_vacancies)"
+                    cur.execute("INSERT INTO employers (employer_id)"
                                 "VALUES (%s, %s, %s) RETURNING employer_id",
-                                (employer_list["employer_id"], employer_list["company_name"],
-                                 employer_list["open_vacancies"]))
+                                (employer_list["employer_id"]))
                 for employer in employers_list:
                     vacancy_list = get_vacancies(employer)
                     for v in vacancy_list:
@@ -90,5 +90,6 @@ def add_to_table(employers_list):
                                     "VALUES (%s, %s, %s, %s, %s, %s)",
                                     (v["vacancy_id"], v["vacancies_name"], v["payment"],
                                      v["requirement"], v["vacancies_url"], v["employer_id"]))
+            conn.commit()
     except psycopg2.Error as error:
         print(f"Ошибка при заполнении таблиц: {error}")

@@ -12,7 +12,7 @@ def get_vacancies(employer_id):
         "page": 0,
         "per_page": 10
     }
-    url = f"https://api.hh.ru/vacancies?employer_id{employer_id}"
+    url = f"https://api.hh.ru/vacancies?employer_id={employer_id}"
     try:
         data_vacancies = requests.get(url, params=params).json()
     except requests.RequestException as error:
